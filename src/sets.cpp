@@ -3,6 +3,8 @@
 #include <LittleFS.h>
 #include <WiFiConnector.h>
 
+#include "getColorByTemp.h"
+
 float tempC = 0.0;
 float humidity = 0.0;
 
@@ -20,8 +22,8 @@ static void build(sets::Builder& b) {
         db.update();
     }
 
-    b.LinearGauge(101, "Temperature", 0, 50, "°C", tempC, sets::Colors::Red);
-    b.LinearGauge(102, "Humidity", 0, 100, "%", humidity, sets::Colors::Blue);
+    b.LinearGauge(101, "Temperature", MIN_TEMP_C, MAX_TEMP_C, "°C", tempC, getColorByTemp(tempC));
+    b.LinearGauge(102, "Humidity", MIN_HUMIDITY, MAX_HUMIDITY, "%", humidity, sets::Colors::Blue);
 
     if (b.beginMenu("WiFi")) {
         b.Input(kk::wifi_ssid, "SSID");
@@ -49,6 +51,8 @@ static void update(sets::Updater& u) {
     digitalWrite(LED_PIN, db[kk::switch_state] ? HIGH : LOW);
 
     u.update(101, tempC);
+    u.updateColor(101, getColorByTemp(tempC));
+    
     u.update(102, humidity);
 }
 

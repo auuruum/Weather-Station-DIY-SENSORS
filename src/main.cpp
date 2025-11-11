@@ -6,6 +6,10 @@
 
 DHT dht11(DHT11_PIN, DHT11);
 
+#include <GTimer.h>
+
+GTimer<millis> dhtTimer(DHT_READ_INTERVAL, true);
+
 void setup() {
     Serial.begin(115200);
     Serial.println();
@@ -19,8 +23,10 @@ void setup() {
 }
 
 void loop() {
-    humidity = dht11.readHumidity();
-    tempC = dht11.readTemperature();
-    
+    if (dhtTimer.tick()) {
+        tempC = dht11.readTemperature();
+        humidity = dht11.readHumidity();
+    }
+
     sett_loop();
 }
