@@ -55,6 +55,16 @@ void setup() {
                     Adafruit_BMP280::FILTER_X16,  
                     Adafruit_BMP280::STANDBY_MS_500);
 
+    // Should make refactor in furure and put to separate function for cleaner code
+    tempC = bmp.readTemperature();
+    pressure = bmp.readPressure() / 100.0F;
+    if (!isnan(tempC) && !isnan(pressure)) {
+        Serial.println("initial forecast sensor read successful");
+        cond.addP(pressure * 100.0F, tempC);
+    } else {
+        Serial.println("initial sensor read failed, skipping forecast");
+    }
+
     server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
         request->send(200, "text/plain", "API is online. Use /weather");
     });
