@@ -1,12 +1,14 @@
 #include <Arduino.h>
 
+#include "Forecaster.h"
+Forecaster cond;
+
 #include "sets.h"
 
 #include <DHT.h>
 
 DHT dht11(DHT11_PIN, DHT11);
 
-#include <Arduino.h>
 #include <Wire.h>
 #include <Adafruit_Sensor.h>
 #include <Adafruit_BMP280.h>
@@ -21,6 +23,7 @@ Adafruit_BMP280 bmp;
 static AsyncWebServer server(API_PORT);
 
 GTimer<millis> SensorTimer(SENSOR_READ_INTERVAL, true);
+GTimer<millis> ForecasterTimer(FORECASTER_INTERVAL_MS, true);
 
 void setup() {
     Serial.begin(115200);
@@ -31,6 +34,8 @@ void setup() {
     server.begin();
 
     Wire.begin(BMP280_SDA_PIN, BMP280_SCL_PIN);
+
+    cond.setH(LOCATION_ALTITUDE);
 
     Serial.println(db[kk::wifi_ssid]);
 
@@ -75,6 +80,11 @@ void loop() {
         tempC = bmp.readTemperature();
         humidity = dht11.readHumidity();
         pressure = bmp.readPressure() / 100.0F;
+    }
+    if (ForecasterTimer.tick()) {
+        cond.addP(pressure * 100.0F, tempC);
+        Serial.print("forecast: ");
+        Serial.println(cond.getCast());
     }
 
     sett_loop();
