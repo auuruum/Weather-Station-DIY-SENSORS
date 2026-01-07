@@ -67,11 +67,16 @@ void setup() {
     tempC = bmp.readTemperature();
     pressure = bmp.readPressure() / 100.0F;
     humidity = dht11.readHumidity();
-    if (!isnan(tempC) && !isnan(pressure) && !isnan(humidity)) {
+    if (!isnan(tempC) && !isnan(pressure)) {
         Serial.println("initial forecast sensor read successful");
         cond.addP(pressure * 100.0F, tempC);
     } else {
         Serial.println("initial sensor read failed, skipping forecast");
+    }
+    if(!isnan(humidity)) {
+        Serial.println("initial humidity sensor read successful");
+    } else {
+        Serial.println("initial humidity sensor read failed");
     }
 
     server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
