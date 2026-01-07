@@ -63,10 +63,19 @@ void setup() {
                     Adafruit_BMP280::FILTER_X16,  
                     Adafruit_BMP280::STANDBY_MS_500);
 
+    // DHT11 needs time to stabilize after power-on
+    delay(2000);
+
     // Should make refactor in furure and put to separate function for cleaner code
     tempC = bmp.readTemperature();
     pressure = bmp.readPressure() / 100.0F;
+    
+    // Try reading humidity with retry logic
     humidity = dht11.readHumidity();
+    if (isnan(humidity)) {
+        delay(2000);
+        humidity = dht11.readHumidity();
+    }
     if (!isnan(tempC) && !isnan(pressure)) {
         Serial.println("initial forecast sensor read successful");
         cond.addP(pressure * 100.0F, tempC);
@@ -102,6 +111,9 @@ void setup() {
         json += "\"cast\": " + String(cond.getCast());
         json += "}";
 
+        Serial.print("API Request | Humidity: ");
+        Serial.println(humidity);
+
         request->send(200, "application/json", json);
     });
 }
@@ -109,7 +121,17 @@ void setup() {
 void loop() {
     if (SensorTimer.tick()) {
         tempC = bmp.readTemperature();
+        
+        // Read humidity with retry if first attempt fails
         humidity = dht11.readHumidity();
+        if (isnan(humidity)) {
+            delay(2000);
+            humidity = dht11.readHumidity();
+        }
+        
+        Serial.print("DEBUG| Humidity: ");
+        Serial.println(humidity);
+        
         pressure = bmp.readPressure() / 100.0F;
     }
     if (ForecasterTimer.tick()) {
