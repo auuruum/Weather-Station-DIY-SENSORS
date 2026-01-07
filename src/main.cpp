@@ -78,7 +78,8 @@ void setup() {
         String json = "{";
         json += "\"temp\": " + String(tempC) + ",";
         json += "\"humidity\": " + String(humidity) + ",";
-        json += "\"pressure\": " + String(pressure);
+        json += "\"pressure\": " + String(pressure) + ",";
+        json += "\"cast\": " + String(cond.getCast());
         json += "}";
 
         request->send(200, "application/json", json);
