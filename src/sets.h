@@ -33,6 +33,8 @@
 constexpr char32_t FORECASTER_INTERVAL_MS = 30UL * 60UL * 1000UL;   // 30 minutes
 
 // Dont touch below this line
+#define MDNS_ADDRESS "weather-station" // mDNS address can broke other devices if they use data from that station
+
 extern float tempC;
 extern float humidity;
 extern float pressure;
