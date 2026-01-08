@@ -23,6 +23,7 @@ Adafruit_BMP280 bmp;
 static AsyncWebServer server(API_PORT);
 
 GTimer<millis> SensorTimer(SENSOR_READ_INTERVAL, true);
+GTimer<millis> DHT11Timer(DHT11_READ_INTERVAL, true);
 GTimer<millis> ForecasterTimer(FORECASTER_INTERVAL_MS, true);
 
 void setup() {
@@ -41,6 +42,13 @@ void setup() {
 
     Serial.print("SETUP | LED is now ");
     Serial.println(db[kk::switch_state] ? "ON" : "OFF");
+
+    // Initialize DHT11 sensor
+    dht11.begin();
+    Serial.println("DHT11 sensor initialized");
+    
+    // Give DHT11 time to stabilize after power-on (recommended: 1-2 seconds)
+    delay(2000);
 
     if (!bmp.begin(0x76)) {
         Serial.println("Could not find a valid BMP280 sensor, check wiring!");
@@ -89,9 +97,23 @@ void setup() {
 void loop() {
     if (SensorTimer.tick()) {
         tempC = bmp.readTemperature();
-        humidity = dht11.readHumidity();
         pressure = bmp.readPressure() / 100.0F;
     }
+
+    if (DHT11Timer.tick()) {
+        float newHumidity = dht11.readHumidity();
+        if (isnan(newHumidity)) {
+            Serial.println("DHT11 read error");
+            // Keep previous valid value if read fails
+        }
+        else {
+            humidity = newHumidity;
+            Serial.print("Humidity: ");
+            Serial.print(humidity);
+            Serial.println(" %");
+        }
+    }
+
     if (ForecasterTimer.tick()) {
         cond.addP(pressure * 100.0F, tempC);
         Serial.print("forecast: ");

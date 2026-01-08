@@ -28,6 +28,7 @@
 
 // Other constants
 #define SENSOR_READ_INTERVAL 3000  // milliseconds
+#define DHT11_READ_INTERVAL 10000  // milliseconds
 #define API_PORT 81 // Dont set to 80, it is used by settings server
 #define SEALEVELPRESSURE_HPA (1013.25)
 constexpr char32_t FORECASTER_INTERVAL_MS = 30UL * 60UL * 1000UL;   // 30 minutes
