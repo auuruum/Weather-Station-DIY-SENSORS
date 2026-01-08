@@ -79,10 +79,10 @@ void setup() {
     }
 
     server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
-        request->send(200, "text/plain", "API is online. Use /weather");
+        request->send(200, "text/plain", "API is online. Use " SENSOR_STANTION_API_PATH);
     });
 
-    server.on("/weather", HTTP_GET, [](AsyncWebServerRequest *request){
+    server.on(SENSOR_STANTION_API_PATH, HTTP_GET, [](AsyncWebServerRequest *request){
         if (isnan(tempC) || isnan(humidity) || isnan(pressure)) {
             request->send(500, "text/plain", "Failed to read from sensor");
             return;

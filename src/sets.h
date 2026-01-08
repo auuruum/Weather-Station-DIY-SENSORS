@@ -28,12 +28,13 @@
 
 // Other constants
 #define SENSOR_READ_INTERVAL 3000  // milliseconds
-#define API_PORT 81 // Dont set to 80, it is used by settings server
 #define SEALEVELPRESSURE_HPA (1013.25)
 constexpr char32_t FORECASTER_INTERVAL_MS = 30UL * 60UL * 1000UL;   // 30 minutes
 
 // Dont touch below this line
 #define MDNS_ADDRESS "weather-station" // mDNS address can broke other devices if they use data from that station
+#define API_PORT 81 // Dont set to 80, it is used by settings server
+#define SENSOR_STANTION_API_PATH "/weather"
 
 extern float tempC;
 extern float humidity;
