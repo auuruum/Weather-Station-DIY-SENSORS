@@ -50,6 +50,9 @@ void setup() {
     }
     Serial.println("mDNS responder started");
 
+    dht11.begin();
+    Serial.println("DHT11 sensor initialized");
+
     if (!bmp.begin(0x76)) {
         Serial.println("Could not find a valid BMP280 sensor, check wiring!");
         while (1);
