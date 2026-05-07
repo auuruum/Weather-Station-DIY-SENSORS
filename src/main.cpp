@@ -25,6 +25,42 @@ static AsyncWebServer server(API_PORT);
 GTimer<millis> SensorTimer(SENSOR_READ_INTERVAL, true);
 GTimer<millis> ForecasterTimer(FORECASTER_INTERVAL_MS, true);
 
+static void printI2CDevices() {
+    Serial.println("Scanning I2C bus...");
+
+    bool found = false;
+    for (uint8_t address = 1; address < 127; address++) {
+        Wire.beginTransmission(address);
+        if (Wire.endTransmission() == 0) {
+            Serial.print("I2C device found at 0x");
+            if (address < 16) Serial.print("0");
+            Serial.println(address, HEX);
+            found = true;
+        }
+    }
+
+    if (!found) {
+        Serial.println("No I2C devices found");
+    }
+}
+
+static bool beginBmp280() {
+    if (bmp.begin(BMP280_PRIMARY_ADDRESS)) {
+        Serial.print("BMP280 sensor found at 0x");
+        Serial.println(BMP280_PRIMARY_ADDRESS, HEX);
+        return true;
+    }
+
+    if (bmp.begin(BMP280_SECONDARY_ADDRESS)) {
+        Serial.print("BMP280 sensor found at 0x");
+        Serial.println(BMP280_SECONDARY_ADDRESS, HEX);
+        return true;
+    }
+
+    printI2CDevices();
+    return false;
+}
+
 void setup() {
     Serial.begin(115200);
     Serial.println();
@@ -52,12 +88,10 @@ void setup() {
 
     dht11.begin();
 
-    if (!bmp.begin(0x76)) {
+    if (!beginBmp280()) {
         Serial.println("Could not find a valid BMP280 sensor, check wiring!");
         while (1);
     }
-    
-    Serial.println("BMP280 sensor found!");
 
     bmp.setSampling(Adafruit_BMP280::MODE_NORMAL,
                     Adafruit_BMP280::SAMPLING_X2,
@@ -79,10 +113,10 @@ void setup() {
     }
 
     server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
-        request->send(200, "text/plain", "API is online. Use " SENSOR_STANTION_API_PATH);
+        request->send(200, "text/plain", "API is online. Use " SENSOR_STATION_API_PATH);
     });
 
-    server.on(SENSOR_STANTION_API_PATH, HTTP_GET, [](AsyncWebServerRequest *request){
+    server.on(SENSOR_STATION_API_PATH, HTTP_GET, [](AsyncWebServerRequest *request){
         if (isnan(tempC) || isnan(humidity) || isnan(pressure)) {
             request->send(500, "text/plain", "Failed to read from sensor");
             return;

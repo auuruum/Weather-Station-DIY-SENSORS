@@ -10,6 +10,8 @@
 
 #define BMP280_SDA_PIN 21
 #define BMP280_SCL_PIN 22
+#define BMP280_PRIMARY_ADDRESS 0x76
+#define BMP280_SECONDARY_ADDRESS 0x77
 
 // Constants for temperature and humidity ranges
 #define MAX_TEMP_C 50
@@ -34,7 +36,8 @@ constexpr char32_t FORECASTER_INTERVAL_MS = 30UL * 60UL * 1000UL;   // 30 minute
 // Dont touch below this line
 #define MDNS_ADDRESS "weather-station" // mDNS address can broke other devices if they use data from that station
 #define API_PORT 81 // Dont set to 80, it is used by settings server
-#define SENSOR_STANTION_API_PATH "/weather"
+#define SENSOR_STATION_API_PATH "/weather"
+#define SENSOR_STANTION_API_PATH SENSOR_STATION_API_PATH
 
 extern float tempC;
 extern float humidity;
